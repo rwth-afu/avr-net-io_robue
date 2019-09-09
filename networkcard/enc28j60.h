@@ -162,7 +162,7 @@
 	#define ENC28J60_TX_BUFFER_END   ((unsigned int)0x1FFF)
 
 	//store config bank0 reg0x00-reg0x0F in progmem
-	extern unsigned char enc28j60_config[] PROGMEM;
+	extern unsigned char const enc28j60_config[] PROGMEM;
 	extern unsigned char enc28j60_revision;
 
 	#define ETH_INTERRUPT 		INT2_vect

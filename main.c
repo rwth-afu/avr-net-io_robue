@@ -89,7 +89,7 @@ unsigned char ss;
 	int16_t ow_array[MAXSENSORS*3];
 	// Speicherplatz für die ID der Sensoren
 	// Position 0-4 eig. ID, Pos. 5+6 ist die Temperatur, Pos. 7 CRC-Byte
-	PROGMEM	uint8_t		DS18B20IDs[MAXSENSORS+1][OW_ROMCODE_SIZE] = {
+	PROGMEM	uint8_t	const	DS18B20IDs[MAXSENSORS+1][OW_ROMCODE_SIZE] = {
 							OW_ID_T01,	// 1. DS18B20
 							OW_ID_T02,
 							OW_ID_T03,

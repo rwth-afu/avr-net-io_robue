@@ -189,7 +189,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 // -----------------
 
 	// LCD ja/nein
-	#define USE_SER_LCD		1
+	#define USE_SER_LCD		0
 	// LCD im 4Bit Mode oder seriell
 	// Das bedeutet: 
 	// #define USE_PORTD_SCHALT	0 (PORTD kein Schaltausgang!)
@@ -241,10 +241,10 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 // Namen für die dig. Eingänge (PORTA0-3) -> webpage.h
 // ---------------------------------------------------
 
-	#define Eing_A0 "A0_Fenster_1"
-	#define Eing_A1 "A1_Fenster_2"
-	#define Eing_A2 "A2_"
-	#define Eing_A3 "A3_"
+	#define Eing_A0 "Schaltschrank"
+	#define Eing_A1 "Unbelegt 1"
+	#define Eing_A2 "Unbelegt 2"
+	#define Eing_A3 "Unbelegt 3"
 
 
 // Namen für die Schaltausgänge -> webpage.h (abhängig von LCD)
@@ -252,14 +252,14 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 	// Zuordnung der Aufgaben von PORTC0-7 -> webpage.h
 	// Achtung: Kein LCD an PORTC anschließen! Beschädigung möglich.
-	#define Ausg_C0	"C0_Relais_1"
-	#define Ausg_C1	"C1_Relais_2"
-	#define Ausg_C2	"C2_Relais_3"
-	#define Ausg_C3	"C3_Relais_4"
-	#define Ausg_C4	"C4_Relais_5"
-	#define Ausg_C5	"C5_Relais_6"
-	#define Ausg_C6	"C6_Relais_7"
-	#define Ausg_C7	"C7_Relais_8"	
+	#define Ausg_C0	"Strom 12V APRS"
+	#define Ausg_C1	"Strom 12V Funkruf"
+	#define Ausg_C2	"Linux PC Reset"
+	#define Ausg_C3	"Linux PC On/Off"
+	#define Ausg_C4	"Ausgang 4"
+	#define Ausg_C5	"Ausgang 5"
+	#define Ausg_C6	"Ausgang 6"
+	#define Ausg_C7	"Ausgang 7"	
 
 
 // Netzwerkeinstellungen
@@ -271,17 +271,17 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 	#define USE_RTL8019		0
 
 	//IP des Webservers
-	#define MYIP		IP(192,168,0,99)
+	#define MYIP		IP(44,225,56,198)
 
 	//Netzwerkmaske
-	#define NETMASK		IP(255,255,255,0)
+	#define NETMASK		IP(255,255,255,224)
 
 	//IP des Routers
-	#define ROUTER_IP	IP(192,168,0,3)
+	#define ROUTER_IP	IP(44,225,56,193)
 
 	//IP des NTP-Servers z.B. Server 1.de.pool.ntp.org
 	#define USE_NTP		1 // 1= NTP Client on
-	#define NTP_IP		IP(77,37,6,59)
+	#define NTP_IP		IP(44,225,56,193)
 
 	//Broadcast-Adresse für WOL
 	#define USE_WOL		0 //1 = WOL on
@@ -293,18 +293,18 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 	#define MYMAC2	0x22
 	#define MYMAC3	0xF9
 	#define MYMAC4	0x01
-	#define MYMAC5	0x00
-	#define MYMAC6	0x01
+	#define MYMAC5	0xAC
+	#define MYMAC6	0xF3
 
 	//Umrechnung von IP zu unsigned long
 	#define IP(a,b,c,d) ((unsigned long)(d)<<24)+((unsigned long)(c)<<16)+((unsigned long)(b)<<8)+a
 
 	//Webserver mit Passwort? (0 == mit Passwort)
-	#define HTTP_AUTH_DEFAULT	1
+	#define HTTP_AUTH_DEFAULT	0
 	
 	//AUTH String "USERNAME:PASSWORT" max 14Zeichen 
 	//für Username:Passwort
-	#define HTTP_AUTH_STRING "admin:uli1"
+	#define HTTP_AUTH_STRING "admin:password"
 
 
 // 1-Wire-Einstellungen
@@ -314,7 +314,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 	// In webpage.h sind z.Z. nur Eintraege fuer 4 vorhanden.
 
 	// 1-Wire ja/nein (0=nein, 1=ja)
-	#define USE_OW		1
+	#define USE_OW		0
 	// max. Anzahl der Sensoren
 	#define MAXSENSORS	8
 	// z.Z. nur EIN 1-Wire-Bus
@@ -411,7 +411,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 // ----
 
 	// Schaltautomatik installieren (-> main.c, httpd.c, webpage.h)
-	#define USE_AUTOMATIK	1
+	#define USE_AUTOMATIK	0
 
 	// Feuchtesensor HIH4000 (experimentell)
 	#define USE_HIH4000	0
@@ -426,7 +426,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 	#define GET_WEATHER     0
 
 	// Lokale Wetterdaten
-	#define WETTER24	1
+	#define WETTER24	0
 	#define LOCALWEATHER24	"http://www.wetter24.de/nc/de/home/wetter/weltwetter/ortewetter.html?cityID=49X7241&type=98"
     
 	//Commandos und Ausgaben erfolgen über Telnet

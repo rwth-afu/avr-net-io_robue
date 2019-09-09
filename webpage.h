@@ -31,10 +31,10 @@
 
 //----------------------------------------------------------------------------
 //Dazustellende Webseite
-	PROGMEM char Page1[] = {
+	PROGMEM char const Page1[] = {
 	"<html><head><meta http-equiv=\"refresh\" content=\"30\" text/html; charset=iso-8859-1\">\r\n"
 
-	"<title>AVR NET IO</title>\r\n"
+	"<title>DB0KWE ATV & Hamnet Relais</title>\r\n"
 
 	"<style type=\"text/css\">\r\n"
   	".fett {font-weight: bold; margin-top:15px;}\r\n"
@@ -46,7 +46,7 @@
 	"</head><body><center>\r\n"
 
 	"<table style=\"width: 600px; text-align: left; background-color: rgb(153, 153, 255);\" cellpadding=\"5\">\r\n"
-	"<tr><td><h1>AVR-NET-IO</h1>\r\n"
+	"<tr><td><h1>DB0KWE ATV & Hamnet Relais</h1>\r\n"
 	"<table style=\"width: 100%; font-weight: bold;\">\r\n"
         "<tr><td>Serverzeit: %TI@</td><td style=\"text-align: right;\">Pagecounter: %VA@29</td></tr></table>\r\n"
 	"</td></tr></table>\r\n"
@@ -61,15 +61,15 @@
 
 	"<tr><td>"
 	Eing_A0
-	"</td><td style=\"background-color: rgb(%PINA0);\"></td><td align=\"center\">AD-A4</td><td>%VA@04</td></tr>\r\n"
+	"</td><td style=\"background-color: rgb(%PINA0);\"></td><td align=\"center\">ADC1 Netzteil</td><td>%VA@05</td></tr>\r\n"
 
 	"<tr><td>"
 	Eing_A1
-	"</td><td style=\"background-color: rgb(%PINA1);\"></td><td align=\"center\">AD-A5</td><td>%VA@05</td></tr>\r\n"
+	"</td><td style=\"background-color: rgb(%PINA1);\"></td><td align=\"center\">ADC2 APRS</td><td>%VA@06</td></tr>\r\n"
 
 	"<tr><td>"
 	Eing_A2
-	"</td><td style=\"background-color: rgb(%PINA2);\"></td><td align=\"center\">AD-A6</td><td>%VA@06</td></tr>\r\n"
+	"</td><td style=\"background-color: rgb(%PINA2);\"></td><td align=\"center\">ADC3 Funkruf</td><td>%VA@04</td></tr>\r\n"
 
 	"<tr><td>"
 	Eing_A3
@@ -255,22 +255,22 @@
 #if USE_SER_LCD
 	"<div>PORTB -> ENC28J60<br>PORTD -> LCDisplay</div>\r\n"
 #else
-	"<div>PORTB -> ENC28J60</div>\r\n"
-	"<div>Achtung: Kein LCD an PORTC anschließen! Beschädigung möglich.</div>\r\n"
+//	"<div>PORTB -> ENC28J60</div>\r\n"
+//	"<div>Achtung: Kein LCD an PORTC anschließen! Beschädigung möglich.</div>\r\n"
 #endif
 	
 	"<br>\r\n"
 
 	"<div>Webserver von Ulrich Radig " SoftVers "</div>\r\n"
 	"<div>Compiliert am "__DATE__" um "__TIME__" mit GCC Version "__VERSION__"</div>\r\n"
-	"<div>"RoBueVers" für AVR-NET-IO</div>\r\n"
-		
+	"<div>RoBueVers für AVR-NET-IO</div>\r\n"
+	"<div>Modifiziert von Ralf Wilke DH3WR und Moritz Holtz DF5MH Amateurfunkgruppe RWTH Aachen <a href=\"http://db0sda.ampr.org/\" target=\"_blank\">db0sda.ampr.org</a></div>\r\n"
 	"</span></body></html>\r\n"
 	"%END"};
 
 // RoBue:
 // Daten-Seite: 1-Wire-Werte, AD-Werte  
-PROGMEM char Page2[] = {
+PROGMEM char const Page2[] = {
 
 #if USE_OW
 	// 1-Wire Sensoren -> Temperatur

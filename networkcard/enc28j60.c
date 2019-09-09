@@ -39,7 +39,7 @@ unsigned char enc28j60_revision;
 
 //store enc28j60 config in program memory
 //syntax: <REGx>, <REGVALx>, <REGy>, <REGVALy>,...
-unsigned char enc28j60_config[] PROGMEM = {
+unsigned char const enc28j60_config[] PROGMEM = {
 	//setup bank0 (config stored in progmem, see above)
 	//tx buffer:
 	ENC28J60_REG_ETXSTL, LO8(ENC28J60_TX_BUFFER_START), //start lo

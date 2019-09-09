@@ -26,15 +26,15 @@
 
 #if USE_MAIL
 
-PROGMEM char SMTP_HELO[] = "HELO ETH_M32_EX\r\n";
-PROGMEM char SMTP_AUTH[] = "AUTH LOGIN\r\n";
-PROGMEM char SMTP_RSET[] = "RSET\r\n";
-PROGMEM char SMTP_MAIL[] = "MAIL FROM:<"__SMTP_MAIL_FROM__">\r\n";
-PROGMEM char SMTP_RCPT[] = "RCPT TO:<"__SMTP_MAIL_TO__">\r\n"; // hier user eintragen, an den die mail gehen soll
-PROGMEM char SMTP_DATA[] = "DATA\r\n";
-PROGMEM char SMTP_TEXT[] = "From: \"ETH_M32_EX\" <"__SMTP_MAIL_FROM__">\r\nSubject: Test_EMail!\r\n\r\nHallo\r\nGruss Uli.";
-PROGMEM char SMTP_END[]  = "\r\n.\r\n";
-PROGMEM char SMTP_QUIT[] = "QUIT\r\n";
+PROGMEM char const SMTP_HELO[] = "HELO ETH_M32_EX\r\n";
+PROGMEM char const SMTP_AUTH[] = "AUTH LOGIN\r\n";
+PROGMEM char const SMTP_RSET[] = "RSET\r\n";
+PROGMEM char const SMTP_MAIL[] = "MAIL FROM:<"__SMTP_MAIL_FROM__">\r\n";
+PROGMEM char const SMTP_RCPT[] = "RCPT TO:<"__SMTP_MAIL_TO__">\r\n"; // hier user eintragen, an den die mail gehen soll
+PROGMEM char const SMTP_DATA[] = "DATA\r\n";
+PROGMEM char const SMTP_TEXT[] = "From: \"ETH_M32_EX\" <"__SMTP_MAIL_FROM__">\r\nSubject: Test_EMail!\r\n\r\nHallo\r\nGruss Uli.";
+PROGMEM char const SMTP_END[]  = "\r\n.\r\n";
+PROGMEM char const SMTP_QUIT[] = "QUIT\r\n";
 
 unsigned char mail_enable = 0;
 unsigned int  my_mail_cp = 0;

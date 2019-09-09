@@ -46,22 +46,22 @@ char time_string_Buffer[10];
 // -> main.c (Speicherplatz für 1-wire Sensorwerte)
 extern volatile int16_t ow_array[MAXSENSORS];
 
-PROGMEM char http_header1[]={	"HTTP/1.0 200 Document follows\r\n"
+PROGMEM char const http_header1[]={	"HTTP/1.0 200 Document follows\r\n"
 								"Server: AVR_WEB_Switch\r\n"
 								"Content-Type: text/html\r\n\r\n"};
 
-PROGMEM char http_header2[]={	"HTTP/1.0 200 Document follows\r\n"
+PROGMEM char const http_header2[]={	"HTTP/1.0 200 Document follows\r\n"
 								"Server: AVR_WEB_Switch\r\n"
 								"Content-Type: image/jpg\r\n\r\n"};
 
-PROGMEM char http_header3[]={	"HTTP/1.0 401 Unauthorized\r\n"
+PROGMEM char const http_header3[]={	"HTTP/1.0 401 Unauthorized\r\n"
 								"Server: AVR_WEB_Switch\r\n"
 								"WWW-Authenticate: Basic realm=\"NeedPassword\""
 								"\r\nContent-Type: text/html\r\n\r\n"};
 
 //----------------------------------------------------------------------------
 //Kein Zugriff Seite bei keinem Passwort
-PROGMEM char Page0[] = {"401 Unauthorized%END"};
+PROGMEM char const Page0[] = {"401 Unauthorized%END"};
 
 unsigned char rx_header_end[5] = {"\r\n\r\n\0"};
 
@@ -638,7 +638,18 @@ void httpd_data_send (unsigned char index)
 			{	
 				b = (pgm_read_byte(http_entry[index].new_page_pointer+3)-48)*10;
 				b +=(pgm_read_byte(http_entry[index].new_page_pointer+4)-48);	
-				itoa (var_array[b],var_conversion_buffer,10);
+				if (b >=4 && b <= 6) { // Analog Value
+					uint32_t vconv = var_array[b];
+					vconv *= 1425;
+					vconv /= 100;
+					itoa (vconv,var_conversion_buffer, 10);
+					int n = strnlen(var_conversion_buffer, CONVERSION_BUFFER_LEN-3);
+					var_conversion_buffer[n] = 'm';
+					var_conversion_buffer[n+1] = 'V';
+					var_conversion_buffer[n+2] = 0;
+				} else {
+					itoa (var_array[b],var_conversion_buffer,10);
+				}
 				str_len = strnlen(var_conversion_buffer,CONVERSION_BUFFER_LEN);
 				memmove(&eth_buffer[TCP_DATA_START+a],var_conversion_buffer,str_len);
 				a = a + (str_len-1);

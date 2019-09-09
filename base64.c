@@ -23,7 +23,7 @@
 ------------------------------------------------------------------------------*/
 #include "base64.h"
 
-PROGMEM char BASE64CODE[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+PROGMEM char const BASE64CODE[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
 void decode_base64 (unsigned char *str1_in,unsigned char *str2_out)
 {

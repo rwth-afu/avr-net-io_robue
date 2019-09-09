@@ -30,7 +30,7 @@ volatile unsigned char channel = 4;
 //
 void ADC_Init(void)
 { 
-	ADMUX = (1<<REFS0) + channel;
+	ADMUX = (1<<REFS0) + (1<<REFS1) + channel;
 	//Free Running Mode, Division Factor 128, Interrupt on
 	ADCSRA=(1<<ADEN)|(1<<ADSC)|(1<<ADATE)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0)|(1<<ADIE);
 }
@@ -39,7 +39,7 @@ void ADC_Init(void)
 //
 ISR (ADC_vect)
 {
-    ANALOG_OFF; //ADC OFF
+    //ANALOG_OFF; //ADC OFF
 	var_array[channel++] = ADC;
 	//usart_write("Kanal(%i)=%i\n\r",(channel-1),var_array[(channel-1)]);
 
@@ -48,7 +48,7 @@ ISR (ADC_vect)
 	// if (channel > 7) channel = 4;
 	if (channel > 6) channel = 4;
   
-    ADMUX =(1<<REFS0) + channel;
+    ADMUX =(1<<REFS0) + (1<<REFS1) + channel;
     //ANALOG_ON;//ADC ON
 }
 

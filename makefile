@@ -89,7 +89,7 @@ SRC += camera/servo.c
 
 # RoBue:
 # 1-Wire-Unterstützung
-SRC += 1-Wire/crc8.c 1-Wire/delay.c 1-Wire/ds18x20.c 1-Wire/onewire.c
+SRC += 1-wire/crc8.c 1-wire/delay.c 1-wire/ds18x20.c 1-wire/onewire.c
 
 # cni:
 # Add LibSHT
