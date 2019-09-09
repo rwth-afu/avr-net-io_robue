@@ -1,0 +1,483 @@
+AVR-NET-IO - (RoBue)
+====================
+
+
+Info:
+----
+
+AVR-NET-IO_RoBue_Vxxx ist ein Webserver,
+der in erster Linie zur Haus- und Heizungssteuerung gedacht ist.
+Er baut hardwareseitig auf dem AVR-NET-IO der Firma Pollin auf.
+(-> www.pollin.de, Best.Nr. 810 058)
+Die Software basiert auf dem Webserver von Ulrich Radig.
+(-> www.ulrichradig.de, ETH_M32_EX, V1.00.99)
+Außerdem wurden Modifikationen und Erweiterungen aus ähnlichen Projekten mit herangezogen, z.B.
+- FTP-Server von Wallucks (mit 1-Wire)
+(-> www.ulrichradig.de/site/forum/viewtopic.php?f=35&t=973)
+- "Steuerung und Regelung eines Raums mit dem AVR-Webserver" von Simon Jansen
+(-> www.mikrocontroller.net/articles/Steuerung_und_Regelung_eines_Raums_mit_dem_AVR-Webserver)
+- u.a.
+
+Die Aufteilung der Ports ist folgendermaßen (genauer s.u.):
+- PORTA übernimmt die Eingabe und die Abfrage von Sensoren (ein/aus, analog, 1-Wire)
+- PORTB regelt den Datenaustausch mit dem Netzwerkcontroller ENC28J60
+- PORTC ist zum Schalten (z.B. Relaisplatine von Pollin (Sub-D-Buchse))
+- PORTD ist zur seriellen Datenübertragung, LCD u.a. vorgesehen.
+
+Die eigentliche Steuerung geschieht in folgenden Dateien:
+- config.h (Konfiguration)
+- main.c (Auslesen der Sensoren, Schaltanweisungen)
+- httpd.c (Kommunikation Weboberfläche)
+- webpage.h (Weboberfläche)
+
+Die Webseite wird aufgerufen mit:
+"http://IP", z.B. "http://192.168.0.99"
+
+Sie hat drei Teile:
+- Anzeige der Werte der Sensoren an PORTA (digital, analog)
+- Anzeige der Temperaturwerte der 1-Wire-Sensoren (DS18B20)
+- Administration der Schaltbedingungen für PORTD und/oder PORTC
+
+Wichtig:
+
+AVR-NET-IO_RoBue ist letztlich kein fertiges Allroundsystem,
+sondern erfordert Anpassungen an die eigenen persönlichen Wünsche.
+Deswegen sollten Grundkenntnisse in C und im Umgang mit Mikrocontrollern vorhanden sein. 
+
+Trotzdem hat der Webserver eine bestimmte Grundkonfiguration (V1.5),
+mit der man fürs erste arbeiten und die man dann auch später erst anpassen kann:
+UART/RS232 (PORTD0,1)
+LCD im 4-Bit Mode an PORTD2-7, PORTB0 (= EXT-Port) 
+Temperaturmessung mit 5 Sensoren (DS1820)
+	- Raum_1
+	- Raum_2
+	- Aussen
+	- Zirkulationspumpe (Rücklauf, Vorlauf)
+(Die IDs der Sensoren muessen in config.h. manuell eingegeben werden.
+Es gibt bisher noch keine sinnvolle automatische Suchfunktion.
+Platz ist fuer max. 8 Sensoren reserviert.)
+Schaltfunktionen (vgl. main.c, httpd.c, webpage.h):
+	- PORTC0: Raum_1 abhaengig von Sensor 0
+	- PORTC1: Raum_2 abhaengig von Sensor 1 und Fenster offen/zu (PORTA1)
+	- PORTC4: Zirkulationspumpe mit Sensor 3,4
+	- PORTC6: Licht ein/aus abhaengig von LDR an PORTA6 (AD-Wert)
+	- PORTC7: Zeitschaltuhr
+
+
+Anpassung/Programmierung:
+------------------------
+
+Einfach (nur config.h, 1-Wire-Sensoren):
+
+Wenn man 1-Wire-Sensoren nutzen will (#define USE_OW 1),
+MÜSSEN deren 8-stellige IDs und ihre Anzahl in config.h im hex-Format eingetragen werden.
+Seit Version 1.3 wird dazu ein Programm als hex-Datei mit ausgeliefert
+("sensoren.hex", Verzeichnis: "AVR-NET-IO_Bootloader+Hex-Files"),
+das man auf AVR-NET-IO flashen kann (Ponyprog) 
+und das dann die IDs über die serielle Schnittstelle ausgibt.
+Vom PC aus lassen sich diese dann mit dem Programm "Putty" (Serial, 9600 Baud) lesen.
+Nach der Eingabe dieser IDs kann man eigentlich schon compilieren.
+
+Man kann aber auch noch einige Änderungen vornehmen, z.B. ob man
+- die serielle Schnittstelle auf Telnet umleiten möchte,
+- eine andere IP- und MAC-Adresse braucht,
+- Zeitserver im Internet abfragen will
+- andere Bezeichnungen für die Schaltausgänge möchte,
+- einen Passwortschutz braucht 
+...
+  
+Weitergehend (config.h, main.c, httpd.c, webpage.h, Schaltautomatik):
+
+Änderungen und Anpassungen muss man vor allem in 
+- config.h (Anzahl der Sensoren, ID)
+- main.c (ow_array, Schaltbedingungen)
+- httpd.c (Administration im Betrieb)
+- webpage.h (Ausgabe, Administration)
+vornehmen.
+Es lohnt sich, diese Sourcen einfach auszudrucken.
+ 
+Grundsätzlicher Ablauf der Administration über Webseite:
+Die über die Webseite eingegebenen Werte für die Schaltbedingungen 
+(z.B. Schalttemperatur, Schaltzeit, ...)
+werden in httpd.c in das Variablen-Array "var_array" eingetragen.
+In main.c werden die 1-Wire-Sensoren ausgelesen 
+und die Temperaturen in "ow_array" abgelegt
+und zugleich die Schaltbedingungen in "var_array" abgefragt,
+mit Temperatur, Zeit etc. verglichen und gegebenenfalls ausgeführt.
+Diese "Automatik" lässt sich ab Version 1.4 über die Webseite deaktivieren,
+so dass man die einzelnen Ports manuell bedienen kann.
+
+Beispiel 1 für Automatik in main.c:
+Schalten von PORTD2 durch Temperatur von Sensor 0: 
+
+	// PORTC0:
+	// Über Temperatur: var_array[10] - Sensor0
+	int16_t TWert
+	TWert = ow_array[0]*10
+	if ( ow_array[0] < TWert ) {
+		PORTC |= (1 << PC0); // ein
+	}
+	else {
+		PORTC &= ~(1 << PC0); // aus
+	}
+
+Auf der Webseite wird z.B. als Schalttemperatur für PORTC0 (Sensor 0) der Wert 17 Grad eingestellt.
+Dieser Wert wird über httpd.c in "var-array[10]" abgelegt.
+In der Hauptschleife von main.c werden alle 10s die Temperaturen ausgelesen.
+Der Wert für Sensor 0 wird in ow_array[0] abgelegt.
+Als Nächstes wird dann "var_array[10]" mit "ow_array[0]" verglichen.
+Ist der Wert in in "ow_array[0]" kleiner als der in "var_array[10]",
+schaltet PORTC0 auf "1", im anderen Fall schaltet PORTC0 auf "0".
+
+
+Hardware (ab V1.5):
+------------------
+
+- Portbelegung:
+
+PORTA0-3	digitale Eingänge	Test ein/aus (0V/+5V)
+PORTA4-6	analoge Eingänge	Digitalwandler 0-1023
+PORTA7		1-Wire			Temperatursensoren
+
+PORTB0		frei
+PORTB1		Jumper			Bootkontrolle (?)
+PORTB3		frei
+PORTB2,4-7	ENC28J60		Netzwerkcontroller
+
+PORTC0-7	Schaltausgaenge		z.B. Relaiskarte Pollin
+
+PORTD0-1	UART			Datenausgabe, Kontrolle, WebCam
+PORTD2-7	multifunktional		LCD, Schalten, Servo ...
+
+- LCD (ab V1.5 an PORTD):
+
+Das LCD dient eigentlich nur zur einfachen Kontrolle,
+ob der Server (noch) richtig läuft.
+Es werden IP, Counter, Uhrzeit und Temperaturen ausgegeben.
+
+Abschalten in config.h:
+	#define USE_SER_LCD	0
+
+Es gibt 2 Varianten:
+Die serielle (V. Ulrich Radig) und die 4-Bit parallele.
+
+Für die serielle Variante sind folgende Ports vorgesehen (-> lcd.h): 
+LCD_DATA_ENABLE	-> PORTD2
+LCD_DATA	-> PORTD3
+LCD_CLOCK	-> PORTD4
+	
+Für den 4-Bit-Modus (PORTD, EXT) sind folgende Anschlüsse nötig (-> lcd.h):
+EXT	LCD		PORT
+9	--> Pin 1 GND
+10	--> Pin 2 +5V
+1	--> Pin 4 RS	PORTD2
+2	--> Pin 5 RW	PORTD3
+7	--> Pin 6 E	PORTB0
+GND	--> Pin 7
+GND	--> Pin 8
+GND	--> Pin 9
+GND	--> Pin 10
+3	--> Pin 11 DB4	PORTD4
+4	--> Pin 12 DB5	PORTD5
+5	--> Pin 13 DB6	PORTD6
+6	--> Pin 14 DB7	PORTD7
+8	--> Hintergrundbeleuchtung
+
+- 1-Wire (PORTA7):
+Es werden bisher nur Temperatursensoren vom Typ 
+	-> DS18S20 (DS1820B?) mit ID 0x10 
+unterstützt.
+Die IDs und die Anzahl müssen per Hand in den Sourcecode (config.h) eingetragen werden.
+
+- SHT71-Feuchte- und Temperatursensor (PORTA5,6 oder PORTD5,6)
+
+- Servo für Webcam (PORTD7)
+
+
+Netzwereinstellungen (config.h):
+-------------------------------
+
+- IP:
+	#define MYIP		IP(192,168,0,99)
+
+- Subnetmask:
+	#define NETMASK		IP(255,255,255,0)
+
+- Router:
+	#define ROUTER_IP	IP(192,168,0,3)
+
+- MAC-Adresse:
+	#define MYMAC1	0x00
+	#define MYMAC2	0x22
+	#define MYMAC3	0xF9
+	#define MYMAC4	0x01
+	#define MYMAC5	0x00
+	#define MYMAC6	0x01
+
+- NTP (Zeit wird über das Internet geholt)
+Eintrag in config.h:
+	#define USE_NTP		1 // 1= NTP Client on
+	#define NTP_IP		IP(77,37,6,59)
+
+
+********************************************************************************
+
+Änderungen Version 1.1:
+----------------------
+
+-> main.c 
+
+wurde noch etwas vereinfacht:
+
+ow_array[i] = DS18X20_temp_to_decicel(subzero, cel, cel_frac_bits);
+anstelle von:
+//TWert = DS18X20_temp_to_decicel(subzero, cel, cel_frac_bits);
+//ow_array[i] = TWert;
+
+UART Testroutinen deaktiviert
+
+-> webpage.h und httpd.c:
+Uhrzeit (Variable %TI) wurde in Webpage integriert
+
+
+Änderungen Version 1.2:
+----------------------
+
+-> config.h
+
+Alle wichtigen Einstellungen sind nun in config.h integriert,
+so dass man nur noch hier Veränderungen vornehmen muss,
+bevor man sich ein passendes hex-File erstellt.
+
+-> main.c
+
+Die Berechnung der Uhrzeit erfolgt zentral über main.c
+Die Variablen sind: hh,mm,ss
+
+-> webpage.h
+
+Die Ortsbeschreibung der 1-Wire-Sensoren werden in config.h definiert
+und über die Platzhalter T01, T02, T03 ... eingebunden.
+Die Uhrzeit wird aus main.c übernommen
+
+-> cmd.h/c
+
+Erweiterung des Kommandointerprters für UART/RS232
+Weitere Befehle:
+- OW		-> Ausgabe der Temperaturwerte
+- PORTA		-> Ausgabe der dig. u. analog. Werte von PORTA
+- PORTD		-> Ausgabe des Schaltstatus von PORTD2-7 (0/1)
+Die Uhrzeit 
+- TIME 
+wird nicht neu berechnet, sondern aus main.c übernommen.
+
+
+Änderungen Version 1.3:
+----------------------
+
+-> config.h
+Weitere Bezeichnungen für Webseite
+
+-> main.c
+
+Vergrößerung des Variablenarrays vor allem wegen der leichteren Darstellung
+der Schaltwerte auf der Webseite.
+Schalten mit Temperatur
+Schalten mit Analogwert
+Schalten mit Zeit vorerst auf Eis gelegt (Speicherplatz)
+Temperaturanzeige über LCD (Ersetzt IP)
+
+-> httpd.c, webpage.h (main.c)
+
+Darstellung der Temperaturen auch bei Minus-Werten
+Einstellung der Schaltwerte (analog, Temperatur) über Weboberfläche
+
+
+Änderungen Version 1.4:
+----------------------
+
+-> main.c, httpd.c, webpage.h
+
+Weitere Schalt-Funktionen für die Weboberfläche:
+- Schalten mit der Zeit
+ Variablen: var_array[14-17] bzw. %VA@14-17
+- Schaltfunktionen (=Automatik) aktivieren, deaktivieren
+ Variable: var_array[9] bzw. %VA@09
+
+Ersetzen von "ledon/off.gif" für Status von A0-3 
+durch Hintergrundfarbe (grün/rot) der jeweiligen Tabellenzelle
+Spart Speicherplatz!
+Erhöhung des Wertes von var_conversion_buffer auf 15,
+damit der Farbwert übergeben werden kann ("aaa, bbb, ccc").
+
+Abfrage der dig. Eingänge für Heizungssteuerung (Lüftung):
+Dies wird durch Reed-Relais an den Fenstern ermöglicht.
+Die PORTS A0-3 sind über internen Pullup-Widerstand mit +5V verbunden.
+Über die Relais werden sie dann zusätzlich mit GND verbunden.
+Schaltlogik (main.c):
+Fenster zu = Relais geschlossen 
+	-> PORTAx auf GND 
+		-> grüne Statusausgabe
+			-> Heizung kann einschalten
+Fenster offen = Relais offen
+	-> PORTAx auf +5V
+		-> rote Statusausgabe
+			-> Heizung wird nicht eingeschaltet
+			   bzw. wird ausgeschaltet 
+
+Ausgabe der Tages-Min/Max-Werte bei den Temperatursensoren.
+Die Werte sind folgendermaßen abgelegt:
+"ow_array" hat die 3-fache Größe der Sensorenanzahl.
+-> config.h:
+#define MAXSENSORS	5
+-> main.c
+int16_t ow_array[MAXSENSORS*3] = {200,200,200,200,200,0,0,0,0,0,0,0,0,0,0};
+(Temperaturwerte auf 20 Grad voreingestellt, Min/Max-Werte auf 0 Grad)
+Das heißt nun:
+Die Temperatur von Sensor 0 wird in ow_array[0] abgelegt,
+die Minimaltemperratur in ow_array[5] (= MAXSENSORS)
+die Maximaltemperatur in ow_array[10] (= MAXSENSORS*2).
+Die Temperatur von Sensor 1 wird in ow_array[1] abgelegt,
+die Minimaltemperratur in ow_array[6] (= MAXSENSORS+1)
+die Maximaltemperatur in ow_array[11] (= MAXSENSORS*2+1).
+-> webpage.h, httpd.c
+Entsprechend sind die Variablen(Platzhalter) für die Webseite aufgebaut:
+Variable für Temperatur Sensor 0 -> %OW@00
+Variable für Minimalweret Sensor 0 -> %OW@05
+Variable für Maximalwert Sensor 0 -> %OW@10
+usw.
+Warum dieser (komplizierte) Weg?
+Er erspart in httpd.c eigene Routinen zur Ausgabe der Min/Max-Werte.
+Die Min/Max-Werte werden um 00:00:00 Uhr zurückgesetzt,
+d.h. es werden die aktuellen Temperaturwerte eingetragen.
+(Danke, mr_energy)
+ 
+
+Einbindug der lokalen Wetterseite von www.wetter24.de
+(Einstellung in config.h)
+
+Wenn in config.h
+	#define USE_SER_LED	0
+eingestellt wird,
+übernimmt PORTC automatisch die Funktion von PORTD,
+so dass man die Relaiskarte von Pollin direkt an dem
+Sub-D-Erweiterungs-Port das AVR-NET-IOs betreiben kann.
+Damit stehen insgesamt 14 Ports zum Schalten zur Verfügung:
+8 (PORTC0-7 -> Sub-D) + 6 (PORTD2-7 -> EXT)
+
+-> main.c
+
+Messen, Auslesen und Schalten alle 10s
+
+-> webpage.h
+
+Refresh der Webseite alle 30s
+
+-> httpd.c
+
+Max. Analogwert = 1050 (d.h. wird nie erreicht)
+
+-> cmd.c
+
+Schalten von PORTD-Pins über UART/Telnet:
+ PORTD 2 1	-> PORTD2 geht auf 1 (high, +5V)
+(Danke, Georg)
+Entfernen der Befehle, damit wieder Platz ist: 
+ PING, ARP und MAC
+
+Fehler bei Ausgabe von Minus-Temperatur-Werten behoben
+
+-> analog.h
+
+Fehler korrigiert:
+	if (channel > 6) channel = 4
+(Danke, karleido)
+
+
+V1.4a:
+-----
+
+5 Sensoren, statt 4
+
+-> webpage.h
+"Grad C" -> "&deg;C"
+
+-> httpc.h, webpage.h
+Automatik ein/aus wird nun mit "checked" dargestellt bzw. geschaltet
+
+-> cmd.c/h
+Auslesen und Schalten von PORTC, wenn kein LCD dort angeschlossen ist
+PORTC 0 1	-> PORTC0 geht auf 1 (high, +5V)
+
+
+V.1.5:
+-----
+
+-> Grundsaetzlich:
+
+PORTC ist fuer Schaltaufgaben reserviert.
+Deswegen entfaellt dort das LCD.
+LCD wird - bei Bedarf - an PORTD betrieben (EXT-Port).
+PORTD ist fuer diese und andere "Spielereien" gedacht,
+z.B. weitere Schaltausgaenge, Servo, ...)
+
+Platz fuer 8 Temperatursensoren reserviert (auch wenn man weniger braucht).
+
+MAX-VAR-ARRAY (= %VA@xx in webpage.h/httpd.c) nochmal vergroessert:
+#define MAX_VAR_ARRAY	30	//    ursprünglich 10
+	// RoBue:
+	// Variablen-Array 
+	// zum Abspeichern verschiedener Werte
+	// und zum Einfügen in die Webseite %VA@00 bis %VA@29
+	// VA0-3	-> ???
+	// VA4-7	-> Analogwert von PORTA4-7
+	// VA8		-> Reserve (Servo-Position)
+	// VA9		-> Manueller Betrieb ein/aus
+	// VA10-17	-> Schalttemperaturen
+	// VA18,19	-> Schaltwert analog
+	// VA20-23	-> Schaltzeiten ein/aus hh,mm,hh,mm
+	// VA24-28	-> Reserve
+	// VA-Ende	-> Counter
+
+-> lcd.h/c
+
+LCD an PORTD (4-Bit Mode):
+
+-> enc28j60.c
+
+//set up port directions:
+	ENC28J60_DDR |= (1<<ENC28J60_PIN_CS); 
+	//RoBue:
+	//PORTB0 + B3 als zusaetzliche Ausgabe
+	ENC28J60_DDR |= (1<<PB0) | (1<<PB3);
+
+-> main.c, httpd.c, webpage.h
+
+Kleinere Korrekturen in den Schaltroutinen
+Schalten über Temperaturdifferenz (z.B. fuer Zirkulationspumpe) -> PORTC4
+
+-> config.h, httpd.c, webpage.h:
+
+Ansteuerung eines analogen Servos an PORTD7 (z.B. fuer WebCam)
+Eingabe des linken und rechten Anschlags in config.h
+
+-> config.h, main.c, httpd.c, webpage.h:
+
+Ansteuerung eines SHT71 (Feuchte- und Temeperatursensor) an PORTA5+6
+(Dank an Christian alias cni)
+
+-> config.h, main.c:
+
+Erweiterung der LCD-Ausgabe
+Nachkommastellen bei Temperaturwerten (Danke Klaus alias df8jb)
+Ausgabe zwei weiterer Temperaturwerte oder des Status von PORTC.
+
+-> main.c, httpd.c, cmd.c
+
+Korrektur der falschen Ausgabe von Temperaturwerten zwischen 0,0 und -0,9 Grad.
+
+
+
+
+Probleme:
+RESET, vor allem nach dem Flashen, loescht nicht alle Werte/Register bzw. startet nicht sauber (???)

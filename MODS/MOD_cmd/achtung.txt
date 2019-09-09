@@ -1,0 +1,3 @@
+Na verändertes config.h anpassen !!!
+-> USE_LCD_SER
+-> USE_PORTD_SCHALT (!!!)

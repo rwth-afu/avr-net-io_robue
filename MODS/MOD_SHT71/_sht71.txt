@@ -1,0 +1,52 @@
+
+Autor: Christian H. (cni) Benutzerseite
+Datum: 09.02.2009 20:54
+
+RoBue wrote:
+
+> Hallo cni,
+> wird Dein hex-File auch um einiges länger, auch wenn in config.h die
+> SHT-unterstützung deaktiviert wird? Ich muss das auch in makefile
+> auskommentieren, damit ich die alte Länge erhalte.
+> Benutzt Du ein LCD an PORTD? könnten wir uns evtl. auch auf die
+> Anschlüsse D5 und D6 für SHT einigen?
+> Wie kann man mehrere Sensoren ansteuern?
+>
+> Grüße RoBue
+
+Hi RoBue,
+
+ja das Problem stellt sich, da die libsht ziemlich groß ist.
+Ist musste servo, camera, telnet, wol, sendmail und rtl8019 im makefile
+auskommentieren:
+
+# If there is more than one source file, append them above, or modify and
+# uncomment the following:
+SRC =  main.c usart.c stack.c timer.c cmd.c base64.c
+
+#SRC += networkcard/enc28j60.c networkcard/rtl8019.c
+SRC += networkcard/enc28j60.c
+
+#SRC += httpd.c telnetd.c ntp.c lcd.c udp_lcd.c wol.c
+SRC += httpd.c ntp.c lcd.c udp_lcd.c
+
+#SRC += http_get.c analog.c sendmail.c
+SRC += http_get.c analog.c
+
+SRC += camera/cam.c camera/servo.c
+
+SRC += 1-Wire/crc8.c 1-Wire/delay.c 1-Wire/ds18x20.c 1-Wire/onewire.c
+
+SRC += sht/libsht.c
+
+Dann hatte ich die passende Größe für den Mega32. :-(
+Um alles zu nutzen braucht mann dann wohl doch einen Mega644!
+Evtl. kannst Du es ja als MOD mit einbauen.
+Die Anschlüße sind ja in der Config einstellbar, meinetwegen
+Standartmäßig auf D5 und D6, kann man dann ja ändern, wenn man will!
+Mehrere Sensoren gehen nur über weitere 2 Ports, also wären pro Sensor 2
+weitere Ports belegt!
+
+Viele Grüße,
+Christian
+

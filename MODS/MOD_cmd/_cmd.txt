@@ -1,0 +1,17 @@
+Da im Atmega32 der Speicherplatz an Grenzen stößt,
+wurden einige Befehle aus der originalen cmd.c/h entfernt:
+- ARP
+- MAC
+- PING
+- VER
+An ihrer Stelle wurden aber neue eingefügt (je nach Konfiguration):
+- OW		-> Ausgabe der Temperaturwerte
+- PORTA		-> Ausgabe der Portwerte
+- PORTC		-> Ausgabe der Pins von PORTC (0/1)
+- PORTCSET	-> Setzen der Pins von PORTC ("PORTCSET Pin(0-7) Wert(0/1)")
+- PORTD		-> wie PORTC
+- PORTDSET	-> wie PORTCSET
+
+Wenn trotzdem Platz ist (z.B. Atmega 644),
+dann kann man cmd.c/h im Verzeichnis der Sourcen durch cmd_maxi ersetzen.
+Darin sind die alten und neuen Befehle komplett enthalten.
