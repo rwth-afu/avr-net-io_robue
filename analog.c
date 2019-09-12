@@ -25,6 +25,7 @@
 
 #if USE_ADC
 volatile unsigned char channel = 4;
+volatile unsigned char sampnum = 0;
 
 //------------------------------------------------------------------------------
 //
@@ -40,16 +41,22 @@ void ADC_Init(void)
 ISR (ADC_vect)
 {
     //ANALOG_OFF; //ADC OFF
+	if (sampnum < 2) {
+		sampnum++;
+		return;
+	}
+	sampnum = 0;
 	var_array[channel++] = ADC;
 	//usart_write("Kanal(%i)=%i\n\r",(channel-1),var_array[(channel-1)]);
 
+	ANALOG_OFF;
 	// RoBue:
 	// A7 steht nicht mehr zur Verfügung -> 1-Wire
 	// if (channel > 7) channel = 4;
 	if (channel > 6) channel = 4;
   
     ADMUX =(1<<REFS0) + (1<<REFS1) + channel;
-    //ANALOG_ON;//ADC ON
+    ANALOG_ON;//ADC ON
 }
 
 #endif //USE_ADC

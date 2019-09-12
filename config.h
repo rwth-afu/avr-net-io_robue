@@ -251,8 +251,8 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 // ---------------------------------------------------
 
 	#define Eing_ADC1 "Netzteil"
-	#define Eing_ADC2 "APRS"
-	#define Eing_ADC3 "Funkruf"
+	#define Eing_ADC2 "Funkruf"
+	#define Eing_ADC3 "APRS"
 
 
 // Namen für die Schaltausgänge -> webpage.h (abhängig von LCD)

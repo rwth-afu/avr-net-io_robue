@@ -61,15 +61,15 @@
 
 	"<tr><td>"
 	Eing_A0
-	"</td><td style=\"background-color: rgb(%PINA0);\"></td><td align=\"center\">ADC1 " Eing_ADC1 "</td><td>%VV@05 mV</td></tr>\r\n"
+	"</td><td style=\"background-color: rgb(%PINA0);\"></td><td align=\"center\">ADC1 " Eing_ADC1 "</td><td>%VV@04 mV</td></tr>\r\n"
 
 	"<tr><td>"
 	Eing_A1
-	"</td><td style=\"background-color: rgb(%PINA1);\"></td><td align=\"center\">ADC2 " Eing_ADC2 "</td><td>%VV@06 mV</td></tr>\r\n"
+	"</td><td style=\"background-color: rgb(%PINA1);\"></td><td align=\"center\">ADC2 " Eing_ADC2 "</td><td>%VV@05 mV</td></tr>\r\n"
 
 	"<tr><td>"
 	Eing_A2
-	"</td><td style=\"background-color: rgb(%PINA2);\"></td><td align=\"center\">ADC3 " Eing_ADC3 "</td><td>%VV@04 mV</td></tr>\r\n"
+	"</td><td style=\"background-color: rgb(%PINA2);\"></td><td align=\"center\">ADC3 " Eing_ADC3 "</td><td>%VV@06 mV</td></tr>\r\n"
 
 	"<tr><td>"
 	Eing_A3
@@ -350,18 +350,18 @@ PROGMEM char const Page_json[] = {
 	"},"
 	"\"ADC1\": {"
 		"\"name\": \"" Eing_ADC1 "\","
-		"\"mvolt\": %VV@05,"
-		"\"raw\": %VA@05"
+		"\"mvolt\": %VV@04,"
+		"\"raw\": %VA@04"
 	"},"
 	"\"ADC2\": {"
 		"\"name\": \"" Eing_ADC2 "\","
-		"\"mvolt\": %VV@06,"
-		"\"raw\": %VA@06"
+		"\"mvolt\": %VV@05,"
+		"\"raw\": %VA@05"
 	"},"
 	"\"ADC3\": {"
 		"\"name\": \"" Eing_ADC3 "\","
-		"\"mvolt\": %VV@04,"
-		"\"raw\": %VA@04"
+		"\"mvolt\": %VV@06,"
+		"\"raw\": %VA@06"
 	"}}%END"
 };
 
