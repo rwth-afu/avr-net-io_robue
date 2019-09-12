@@ -247,6 +247,14 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 	#define Eing_A3 "Unbelegt 3"
 
 
+// Namen für die analogen Eingänge -> webpage.h
+// ---------------------------------------------------
+
+	#define Eing_ADC1 "Netzteil"
+	#define Eing_ADC2 "APRS"
+	#define Eing_ADC3 "Funkruf"
+
+
 // Namen für die Schaltausgänge -> webpage.h (abhängig von LCD)
 // -----------------------------------------
 

@@ -59,6 +59,10 @@ PROGMEM char const http_header3[]={	"HTTP/1.0 401 Unauthorized\r\n"
 								"WWW-Authenticate: Basic realm=\"NeedPassword\""
 								"\r\nContent-Type: text/html\r\n\r\n"};
 
+PROGMEM char const http_header4[]={	"HTTP/1.0 200 Document follows\r\n"
+								"Server: AVR_WEB_Switch\r\n"
+								"Content-Type: application/json\r\n\r\n"};
+
 //----------------------------------------------------------------------------
 //Kein Zugriff Seite bei keinem Passwort
 PROGMEM char const Page0[] = {"401 Unauthorized%END"};
@@ -504,6 +508,10 @@ void httpd_header_check (unsigned char index)
 					{
 						http_entry[index].http_header_type = 0;	
 					}	
+					if (strcasestr(WEBPAGE_TABLE[page_index].filename,".json")!=0)
+					{
+						http_entry[index].http_header_type = 2;	
+					}	
 					http_entry[index].new_page_pointer = WEBPAGE_TABLE[page_index].page_pointer;
 					break;
 				}
@@ -564,6 +572,14 @@ void httpd_header_check (unsigned char index)
 		memcpy_P((char*)&eth_buffer[TCP_DATA_START_VAR],http_header1,(sizeof(http_header1)-1));
         tcp_entry[index].status =  ACK_FLAG | PSH_FLAG;
         create_new_tcp_packet((sizeof(http_header1)-1),index);
+        return;
+	}
+     
+	if(http_entry[index].http_header_type == 2)
+	{
+		memcpy_P((char*)&eth_buffer[TCP_DATA_START_VAR],http_header4,(sizeof(http_header4)-1));
+        tcp_entry[index].status =  ACK_FLAG | PSH_FLAG;
+        create_new_tcp_packet((sizeof(http_header4)-1),index);
         return;
 	}
     return;
@@ -638,15 +654,24 @@ void httpd_data_send (unsigned char index)
 			{	
 				b = (pgm_read_byte(http_entry[index].new_page_pointer+3)-48)*10;
 				b +=(pgm_read_byte(http_entry[index].new_page_pointer+4)-48);	
+				itoa (var_array[b],var_conversion_buffer,10);
+				str_len = strnlen(var_conversion_buffer,CONVERSION_BUFFER_LEN);
+				memmove(&eth_buffer[TCP_DATA_START+a],var_conversion_buffer,str_len);
+				a = a + (str_len-1);
+				http_entry[index].new_page_pointer=http_entry[index].new_page_pointer+5;
+			}
+			
+			
+			// Volt measurements
+			if (strncasecmp_P("VV@",http_entry[index].new_page_pointer,3)==0)
+			{	
+				b = (pgm_read_byte(http_entry[index].new_page_pointer+3)-48)*10;
+				b +=(pgm_read_byte(http_entry[index].new_page_pointer+4)-48);	
 				if (b >=4 && b <= 6) { // Analog Value
 					uint32_t vconv = var_array[b];
 					vconv *= 1425;
 					vconv /= 100;
 					itoa (vconv,var_conversion_buffer, 10);
-					int n = strnlen(var_conversion_buffer, CONVERSION_BUFFER_LEN-3);
-					var_conversion_buffer[n] = 'm';
-					var_conversion_buffer[n+1] = 'V';
-					var_conversion_buffer[n+2] = 0;
 				} else {
 					itoa (var_array[b],var_conversion_buffer,10);
 				}
@@ -803,6 +828,48 @@ void httpd_data_send (unsigned char index)
 				memmove(&eth_buffer[TCP_DATA_START+a],var_conversion_buffer,str_len);
 				a += str_len-1;
 				http_entry[index].new_page_pointer = http_entry[index].new_page_pointer+6;
+			}
+
+			//Einsetzen des Port Status %PBOOLxy durch "true" oder "false"
+			//PIN for PORTA, PORT for B-D
+			//x: A..G  y: 0..7 
+			if (strncasecmp_P("PBOOL",http_entry[index].new_page_pointer,5)==0)
+			{
+				unsigned char pin  = (pgm_read_byte(http_entry[index].new_page_pointer+6)-'0');	
+				b = 0;
+				switch(pgm_read_byte(http_entry[index].new_page_pointer+5))
+				{
+					case 'A':
+						b = (PINA & (1<<pin));
+						break;
+					case 'B':
+						b = (PORTB & (1<<pin));
+						break;
+					case 'C':
+						b = (PORTC & (1<<pin));
+						break;
+					case 'D':
+						b = (PORTD & (1<<pin));
+						break;
+					// RoBue:
+					// Checkbox Automatik
+					case 'X':
+						b = var_array[9];
+						break; 
+				}
+				
+				if(b)
+				{
+					strcpy_P(var_conversion_buffer, PSTR("true"));
+				}
+				else
+				{
+					strcpy_P(var_conversion_buffer, PSTR("false"));
+				}
+				str_len = strnlen(var_conversion_buffer,CONVERSION_BUFFER_LEN);
+				memmove(&eth_buffer[TCP_DATA_START+a],var_conversion_buffer,str_len);
+				a += str_len-1;
+				http_entry[index].new_page_pointer = http_entry[index].new_page_pointer+7;
 			}
 						
 			// RoBue:

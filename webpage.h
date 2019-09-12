@@ -61,15 +61,15 @@
 
 	"<tr><td>"
 	Eing_A0
-	"</td><td style=\"background-color: rgb(%PINA0);\"></td><td align=\"center\">ADC1 Netzteil</td><td>%VA@05</td></tr>\r\n"
+	"</td><td style=\"background-color: rgb(%PINA0);\"></td><td align=\"center\">ADC1 " Eing_ADC1 "</td><td>%VV@05 mV</td></tr>\r\n"
 
 	"<tr><td>"
 	Eing_A1
-	"</td><td style=\"background-color: rgb(%PINA1);\"></td><td align=\"center\">ADC2 APRS</td><td>%VA@06</td></tr>\r\n"
+	"</td><td style=\"background-color: rgb(%PINA1);\"></td><td align=\"center\">ADC2 " Eing_ADC2 "</td><td>%VV@06 mV</td></tr>\r\n"
 
 	"<tr><td>"
 	Eing_A2
-	"</td><td style=\"background-color: rgb(%PINA2);\"></td><td align=\"center\">ADC3 Funkruf</td><td>%VA@04</td></tr>\r\n"
+	"</td><td style=\"background-color: rgb(%PINA2);\"></td><td align=\"center\">ADC3 " Eing_ADC3 "</td><td>%VV@04 mV</td></tr>\r\n"
 
 	"<tr><td>"
 	Eing_A3
@@ -298,6 +298,73 @@ PROGMEM char const Page2[] = {
 	"%VA@06\r\n"
 	"%END"};
 
+PROGMEM char const Page_json[] = {
+	"{"
+	"\"PORTA0\": {"
+		"\"name\": \"" Eing_A0 "\","
+		"\"value\": %PBOOLA0"
+	"},"
+	"\"PORTA1\": {"
+		"\"name\": \"" Eing_A1 "\","
+		"\"value\": %PBOOLA1"
+	"},"
+	"\"PORTA2\": {"
+		"\"name\": \"" Eing_A2 "\","
+		"\"value\": %PBOOLA2"
+	"},"
+	"\"PORTA3\": {"
+		"\"name\": \"" Eing_A3 "\","
+		"\"value\": %PBOOLA3"
+	"},"
+	"\"PORTC0\": {"
+		"\"name\": \"" Ausg_C0 "\","
+		"\"value\": %PBOOLC0"
+	"},"
+	"\"PORTC1\": {"
+		"\"name\": \"" Ausg_C1 "\","
+		"\"value\": %PBOOLC1"
+	"},"
+	"\"PORTC2\": {"
+		"\"name\": \"" Ausg_C2 "\","
+		"\"value\": %PBOOLC2"
+	"},"
+	"\"PORTC3\": {"
+		"\"name\": \"" Ausg_C3 "\","
+		"\"value\": %PBOOLC3"
+	"},"
+	"\"PORTC4\": {"
+		"\"name\": \"" Ausg_C4 "\","
+		"\"value\": %PBOOLC4"
+	"},"
+	"\"PORTC5\": {"
+		"\"name\": \"" Ausg_C5 "\","
+		"\"value\": %PBOOLC5"
+	"},"
+	"\"PORTC6\": {"
+		"\"name\": \"" Ausg_C6 "\","
+		"\"value\": %PBOOLC6"
+	"},"
+	"\"PORTC7\": {"
+		"\"name\": \"" Ausg_C7 "\","
+		"\"value\": %PBOOLC7"
+	"},"
+	"\"ADC1\": {"
+		"\"name\": \"" Eing_ADC1 "\","
+		"\"mvolt\": %VV@05,"
+		"\"raw\": %VA@05"
+	"},"
+	"\"ADC2\": {"
+		"\"name\": \"" Eing_ADC2 "\","
+		"\"mvolt\": %VV@06,"
+		"\"raw\": %VA@06"
+	"},"
+	"\"ADC3\": {"
+		"\"name\": \"" Eing_ADC3 "\","
+		"\"mvolt\": %VV@04,"
+		"\"raw\": %VA@04"
+	"}}%END"
+};
+
 //----------------------------------------------------------------------------
 //Das GIF Bild für den Balken
 //PROGMEM char bild_balken[] = {
@@ -312,6 +379,7 @@ PROGMEM char const Page2[] = {
 	{
 	{"index.htm",Page1},
 	{"daten.html",Page2},
+	{"daten.json",Page_json},
 	#if USE_CAM
 	{"camera.jpg",bild_balken},
 	#endif //USE_CAM
